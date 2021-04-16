@@ -7,6 +7,15 @@ mongoose.connect('mongodb+srv://Sakshi:sakshibobade@cluster0.vpzlm.mongodb.net/u
 
 app.use(bodyParser.json())
 
+app.use((error, req, res, next) => {
+  const statusCode = error.statusCode || 500
+  const data = error.data
+  const message = error.message
+  res.status(statusCode).json({
+    message: message,
+    data: data
+  })
+})
 const urlRoute = require('./routes/urlShortener')
 app.use('/url', urlRoute)
 app.listen(process.env.PORT || 3000)

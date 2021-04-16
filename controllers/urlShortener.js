@@ -10,7 +10,9 @@ exports.urlShortener = async (req, res, next) => {
     if (customShortUrl) {
       const customUrl = await shortUrl.findOne({ short: customShortUrl })
       if (customUrl) {
-        res.status(409).json({})
+        const err = new Error('This name is not available')
+        err.statusCode = 409
+        throw err
       }
     }
     urlObj = await shortUrl.create({ full: fullUrl, short: customShortUrl })
