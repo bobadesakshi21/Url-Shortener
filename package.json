@@ -12,7 +12,7 @@
   "dependencies": {
     "ejs": "^3.1.6",
     "express": "^4.17.1",
-    "mogoose": "0.0.1-security"
+    "mongoose": "^5.12.4"
   },
   "devDependencies": {
     "eslint": "^7.24.0",
