@@ -1,6 +1,9 @@
+const { ObjectId } = require('mongodb')
 const shortUrl = require('../models/shortUrl')
 const validUrl = require('valid-url')
 const { validationResult } = require('express-validator')
+
+const Url = require('../models/shortUrl')
 
 exports.urlShortener = async (req, res, next) => {
   const title = req.body.title
@@ -50,12 +53,43 @@ exports.urlShortener = async (req, res, next) => {
 }
 
 exports.editUrl = async (req, res, next) => {
-  const urlId = req.body.urlId
-  const title = req.body.title
-  const fullUrl = req.body.fullUrl
-  const customShortUrl = req.body.customShortUrl
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    res.status(422).json({
+      errorMessage: errors.array()
+    })
+  }
 
+  try {
+    const urlId = req.body.urlId
+    const updatedTitle = req.body.title
+    const updatedFullUrl = req.body.fullUrl
+    const updatedCustomShortUrl = req.body.customShortUrl
 
+    const id = ObjectId(urlId)
+    const editUrl = await Url.findById(id)
+
+    if (!editUrl) {
+      const error = new Error('Invalid url id')
+      error.statusCode = 404
+      throw error
+    }
+    if (editUrl.userId.toString() !== req.userId) {
+      const error = new Error('Not authorized')
+      error.statusCode = 403
+      throw error
+    }
+    editUrl.title = updatedTitle
+    editUrl.full = updatedFullUrl
+    editUrl.short = updatedCustomShortUrl
+
+    await editUrl.save()
+    res.status(200).send(editUrl)
+  } catch (err) {
+    const error = new Error(err)
+    error.StatusCode = 500
+    return next(error)
+  }
 }
 
 exports.redirectToOrignalUrl = async (req, res, next) => {
