@@ -21,6 +21,6 @@ router.post('/edit',
       .trim()
   ], isAuth, urlController.editUrl)
 
-router.get('/:shortUrl', isAuth, urlController.redirectToOrignalUrl)
+router.get('/:shortUrl', urlController.redirectToOrignalUrl)
 
 module.exports = router

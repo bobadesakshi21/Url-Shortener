@@ -2,6 +2,8 @@ const { ObjectId } = require('mongodb')
 const shortUrl = require('../models/shortUrl')
 const validUrl = require('valid-url')
 const { validationResult } = require('express-validator')
+const UserAgent = require('user-agents')
+const geoip = require('geoip-lite')
 
 const Url = require('../models/shortUrl')
 
@@ -100,6 +102,16 @@ exports.redirectToOrignalUrl = async (req, res, next) => {
 
   urlObj.clicks++
   urlObj.save()
+
+  const userAgent = new UserAgent()
+  const device = userAgent.deviceCategory
+
+  let ipAddress = req.ip
+  if (ipAddress === '::1' || ipAddress === '::ffff:127.0.0.1') {
+    ipAddress = '17.233.175.255'
+  }
+  const geo = geoip.lookup(ipAddress)
+  const country = geo.country
 
   res.redirect(urlObj.full)
 }
