@@ -1,10 +1,16 @@
 const shortUrl = require('../models/shortUrl')
+const validUrl = require('valid-url')
 
 exports.urlShortener = async (req, res, next) => {
   const fullUrl = req.body.fullUrl
   const customShortUrl = req.body.customShortUrl
 
   try {
+    if (!validUrl.isUri(fullUrl)) {
+      const err = new Error('Entered URL is invalid')
+      err.statusCode = 422
+      throw err
+    }
     let urlObj = await shortUrl.findOne({ full: req.body.fullUrl })
 
     // If the orignal url is not allready present
@@ -15,7 +21,7 @@ exports.urlShortener = async (req, res, next) => {
       }
       const customUrl = await shortUrl.findOne({ short: customShortUrl })
       if (customUrl) {
-        const err = new Error('This name is not available. Please choose a different one.')
+        const err = new Error('This short name for the URL is not available. Please choose a different one.')
         err.statusCode = 409
         throw err
       }
