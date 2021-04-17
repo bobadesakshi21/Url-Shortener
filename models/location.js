@@ -15,11 +15,6 @@ const locationSchema = new Schema({
     type: Number,
     required: true,
     default: 0
-  },
-  percentage: {
-    type: Number,
-    required: true,
-    default: 0.0
   }
 })
 

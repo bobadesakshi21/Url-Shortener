@@ -6,6 +6,7 @@ const UserAgent = require('user-agents')
 const geoip = require('geoip-lite')
 
 const Url = require('../models/shortUrl')
+const Location = require('../models/location')
 
 exports.urlShortener = async (req, res, next) => {
   const title = req.body.title
@@ -26,7 +27,7 @@ exports.urlShortener = async (req, res, next) => {
       err.statusCode = 422
       throw err
     }
-    let urlObj = await shortUrl.findOne({ full: req.body.fullUrl })
+    let urlObj = await shortUrl.findOne({ userId: userId, full: req.body.fullUrl })
 
     // If the orignal url is not allready present
     if (!urlObj) {
@@ -38,7 +39,6 @@ exports.urlShortener = async (req, res, next) => {
           throw err
         }
       }
-
       urlObj = await shortUrl.create({
         title: title,
         full: fullUrl,
@@ -95,6 +95,17 @@ exports.editUrl = async (req, res, next) => {
 }
 
 exports.redirectToOrignalUrl = async (req, res, next) => {
+  const userAgent = new UserAgent()
+  let ipAddress = req.ip
+
+  const device = userAgent.deviceCategory
+  if (ipAddress === '::1' || ipAddress === '::ffff:127.0.0.1') {
+    // ipAddress = '207.233.175.255'
+    ipAddress = '117.233.175.255'
+  }
+  const geo = geoip.lookup(ipAddress)
+  const country = geo.country
+
   const shortParam = req.params.shortUrl
   const urlObj = await shortUrl.findOne({ short: shortParam })
 
@@ -103,15 +114,16 @@ exports.redirectToOrignalUrl = async (req, res, next) => {
   urlObj.clicks++
   urlObj.save()
 
-  const userAgent = new UserAgent()
-  const device = userAgent.deviceCategory
-
-  let ipAddress = req.ip
-  if (ipAddress === '::1' || ipAddress === '::ffff:127.0.0.1') {
-    ipAddress = '17.233.175.255'
+  const locationObj = await Location.findOne({ urlId: urlObj._id, country: country })
+  if (!locationObj) {
+    await Location.create({
+      urlId: urlObj._id,
+      country: country,
+      clicks: 1
+    })
+  } else {
+    locationObj.clicks++
+    locationObj.save()
   }
-  const geo = geoip.lookup(ipAddress)
-  const country = geo.country
-
   res.redirect(urlObj.full)
 }
