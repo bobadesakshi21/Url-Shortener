@@ -7,6 +7,7 @@ const geoip = require('geoip-lite')
 
 const Url = require('../models/shortUrl')
 const Location = require('../models/location')
+const Device = require('../models/device')
 
 exports.urlShortener = async (req, res, next) => {
   const title = req.body.title
@@ -100,8 +101,8 @@ exports.redirectToOrignalUrl = async (req, res, next) => {
 
   const device = userAgent.deviceCategory
   if (ipAddress === '::1' || ipAddress === '::ffff:127.0.0.1') {
-    // ipAddress = '207.233.175.255'
-    ipAddress = '117.233.175.255'
+    ipAddress = '207.233.175.255'
+    // ipAddress = '117.233.175.255'
   }
   const geo = geoip.lookup(ipAddress)
   const country = geo.country
@@ -124,6 +125,18 @@ exports.redirectToOrignalUrl = async (req, res, next) => {
   } else {
     locationObj.clicks++
     locationObj.save()
+  }
+
+  const deviceObj = await Device.findOne({ urlId: urlObj._id, device: device })
+  if (!deviceObj) {
+    await Device.create({
+      urlId: urlObj._id,
+      device: device,
+      clicks: 1
+    })
+  } else {
+    deviceObj.clicks++
+    deviceObj.save()
   }
   res.redirect(urlObj.full)
 }
