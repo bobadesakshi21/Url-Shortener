@@ -9,7 +9,10 @@ connectDB()
 app.use(bodyParser.json())
 
 const urlRoute = require('./routes/urlShortener')
+const userRoute = require('./routes/auth')
+
 app.use('/url', urlRoute)
+app.user('/user', userRoute)
 
 // Error Handling
 app.use((error, req, res, next) => {
