@@ -1,0 +1,5 @@
+{
+    "dbConfig": {
+        "mongoURI": "mongodb+srv://Sakshi:sakshibobade@cluster0.vpzlm.mongodb.net/url-shortener?retryWrites=true&w=majority"
+    }
+}
