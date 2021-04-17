@@ -11,17 +11,17 @@ router.post('/register',
       .isEmail()
       .withMessage('Please enter a valid email-address')
       .custom((value, { req }) => {
-        return User.findOne({ where: { email: value } })
+        return User.findOne({ email: value })
           .then(userDoc => {
             if (userDoc) {
-              return Promise.reject('Email Address all ready exists')
+              return Promise.reject('Email address already exists')
             }
           })
       })
       .normalizeEmail(),
     body('username')
       .custom((value, { req }) => {
-        return User.findOne({ where: { username: value } })
+        return User.findOne({ username: value })
           .then(userDoc => {
             if (userDoc) {
               return Promise.reject('Username is not available. Choose a different one')

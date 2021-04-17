@@ -2,8 +2,10 @@ const shortUrl = require('../models/shortUrl')
 const validUrl = require('valid-url')
 
 exports.urlShortener = async (req, res, next) => {
+  const title = req.body.title
   const fullUrl = req.body.fullUrl
   const customShortUrl = req.body.customShortUrl
+  const userId = req.userId
 
   try {
     if (!validUrl.isUri(fullUrl)) {
@@ -16,7 +18,11 @@ exports.urlShortener = async (req, res, next) => {
     // If the orignal url is not allready present
     if (!urlObj) {
       if (!customShortUrl) {
-        urlObj = await shortUrl.create({ full: fullUrl })
+        urlObj = await shortUrl.create({
+          title: title,
+          full: fullUrl,
+          userId: userId
+        })
         return
       }
       const customUrl = await shortUrl.findOne({ short: customShortUrl })
@@ -25,7 +31,12 @@ exports.urlShortener = async (req, res, next) => {
         err.statusCode = 409
         throw err
       }
-      urlObj = await shortUrl.create({ full: fullUrl, short: customShortUrl })
+      urlObj = await shortUrl.create({
+        title: title,
+        full: fullUrl,
+        short: customShortUrl,
+        userId: userId
+      })
     }
     res.status(201).json({
       shortUrl: urlObj.short
