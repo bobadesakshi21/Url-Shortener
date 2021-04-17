@@ -17,20 +17,15 @@ exports.urlShortener = async (req, res, next) => {
 
     // If the orignal url is not allready present
     if (!urlObj) {
-      if (!customShortUrl) {
-        urlObj = await shortUrl.create({
-          title: title,
-          full: fullUrl,
-          userId: userId
-        })
-        return
+      if (customShortUrl) {
+        const customUrl = await shortUrl.findOne({ short: customShortUrl })
+        if (customUrl) {
+          const err = new Error('This short name for the URL is not available. Please choose a different one.')
+          err.statusCode = 409
+          throw err
+        }
       }
-      const customUrl = await shortUrl.findOne({ short: customShortUrl })
-      if (customUrl) {
-        const err = new Error('This short name for the URL is not available. Please choose a different one.')
-        err.statusCode = 409
-        throw err
-      }
+
       urlObj = await shortUrl.create({
         title: title,
         full: fullUrl,
