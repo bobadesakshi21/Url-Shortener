@@ -1,9 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const urlController = require('../controllers/urlShortener')
+const isAuth = require('../middleware/is-auth')
 
-router.post('/', urlController.urlShortener)
+router.post('/', isAuth, urlController.urlShortener)
 
-router.get('/:shortUrl', urlController.redirectToOrignalUrl)
+router.get('/:shortUrl', isAuth, urlController.redirectToOrignalUrl)
 
 module.exports = router

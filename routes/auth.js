@@ -31,7 +31,7 @@ router.post('/register',
     body('password')
       .isLength({ min: 4 })
       .withMessage('Password is too short.')
-  ], authController.register)
+  ], authController.signUp)
 
 router.post('/login', authController.login)
 
