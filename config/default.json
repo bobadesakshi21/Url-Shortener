@@ -1,5 +1,13 @@
 {
     "dbConfig": {
         "mongoURI": "mongodb+srv://Sakshi:sakshibobade@cluster0.vpzlm.mongodb.net/url-shortener?retryWrites=true&w=majority"
+    },
+    "accessToken": {
+        "expiry": "1s",
+        "secret": "accessTokenSecret"
+    },
+    "refreshToken": {
+        "expiry": "7d",
+        "secret": "refreshTokenSecret"
     }
 }

@@ -16,9 +16,11 @@
     "express": "^4.17.1",
     "geoip-lite": "^1.4.2",
     "ip": "^1.1.5",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.4",
     "shortid": "^2.2.16",
     "user-agents": "^1.0.624",
+    "uuid": "^8.3.2",
     "valid-url": "^1.0.9"
   },
   "devDependencies": {
