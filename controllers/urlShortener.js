@@ -1,11 +1,19 @@
 const shortUrl = require('../models/shortUrl')
 const validUrl = require('valid-url')
+const { validationResult } = require('express-validator')
 
 exports.urlShortener = async (req, res, next) => {
   const title = req.body.title
   const fullUrl = req.body.fullUrl
   const customShortUrl = req.body.customShortUrl
   const userId = req.userId
+
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    res.status(422).json({
+      errorMessage: errors.array()
+    })
+  }
 
   try {
     if (!validUrl.isUri(fullUrl)) {
@@ -39,6 +47,15 @@ exports.urlShortener = async (req, res, next) => {
   } catch (err) {
     return next(err)
   }
+}
+
+exports.editUrl = async (req, res, next) => {
+  const urlId = req.body.urlId
+  const title = req.body.title
+  const fullUrl = req.body.fullUrl
+  const customShortUrl = req.body.customShortUrl
+
+
 }
 
 exports.redirectToOrignalUrl = async (req, res, next) => {
