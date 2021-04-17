@@ -23,6 +23,8 @@ router.post('/edit',
 
 router.get('/:shortUrl', urlController.redirectToOrignalUrl)
 
-router.get('/metrics/:urlId', isAuth, urlController.locationMetrics)
+router.get('/locationMetrics/:urlId', isAuth, urlController.locationMetrics)
+
+router.get('/deviceMetrics/:urlId', isAuth, urlController.deviceMetrics)
 
 module.exports = router

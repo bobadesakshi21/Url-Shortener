@@ -174,3 +174,37 @@ exports.locationMetrics = async (req, res, next) => {
     next(err)
   }
 }
+
+exports.deviceMetrics = async (req, res, next) => {
+  try {
+    const deviceMetrics = []
+    const urlParam = req.params.urlId
+
+    const id = ObjectId(urlParam)
+    const reqUrl = await Url.findById(id)
+
+    if (reqUrl.userId.toString() !== req.userId) {
+      const error = new Error('Not authorized')
+      error.statusCode = 403
+      throw error
+    }
+
+    const totalClicks = reqUrl.clicks
+
+    const deviceList = await Device.find({ urlId: urlParam })
+
+    deviceList.forEach(device => {
+      const clicks = device.clicks
+      const percentage = (clicks / totalClicks) * 100
+      const metricsObj = {
+        device: device.device,
+        clicks: clicks,
+        percentage: percentage + '%'
+      }
+      deviceMetrics.push(metricsObj)
+    })
+    res.status(200).send(deviceMetrics)
+  } catch (err) {
+    next(err)
+  }
+}
