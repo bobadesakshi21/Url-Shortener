@@ -101,8 +101,8 @@ exports.redirectToOrignalUrl = async (req, res, next) => {
 
   const device = userAgent.deviceCategory
   if (ipAddress === '::1' || ipAddress === '::ffff:127.0.0.1') {
-    ipAddress = '207.233.175.255'
-    // ipAddress = '117.233.175.255'
+    // ipAddress = '207.233.175.255'
+    ipAddress = '117.233.175.255'
   }
   const geo = geoip.lookup(ipAddress)
   const country = geo.country
@@ -139,4 +139,38 @@ exports.redirectToOrignalUrl = async (req, res, next) => {
     deviceObj.save()
   }
   res.redirect(urlObj.full)
+}
+
+exports.locationMetrics = async (req, res, next) => {
+  try {
+    const locationMetrics = []
+    const urlParam = req.params.urlId
+
+    const id = ObjectId(urlParam)
+    const reqUrl = await Url.findById(id)
+
+    if (reqUrl.userId.toString() !== req.userId) {
+      const error = new Error('Not authorized')
+      error.statusCode = 403
+      throw error
+    }
+
+    const totalClicks = reqUrl.clicks
+
+    const locationList = await Location.find({ urlId: urlParam })
+
+    locationList.forEach(location => {
+      const clicks = location.clicks
+      const percentage = (clicks / totalClicks) * 100
+      const metricsObj = {
+        location: location.country,
+        clicks: clicks,
+        percentage: percentage + '%'
+      }
+      locationMetrics.push(metricsObj)
+    })
+    res.status(200).send(locationMetrics)
+  } catch (err) {
+    next(err)
+  }
 }

@@ -23,4 +23,6 @@ router.post('/edit',
 
 router.get('/:shortUrl', urlController.redirectToOrignalUrl)
 
+router.get('/metrics/:urlId', isAuth, urlController.locationMetrics)
+
 module.exports = router
