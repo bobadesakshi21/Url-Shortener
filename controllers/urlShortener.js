@@ -1,24 +1,25 @@
 const shortUrl = require('../models/shortUrl')
 
 exports.urlShortener = async (req, res, next) => {
-  let urlObj = await shortUrl.findOne({ full: req.body.fullUrl })
-
   const fullUrl = req.body.fullUrl
   const customShortUrl = req.body.customShortUrl
 
   try {
+    let urlObj = await shortUrl.findOne({ full: req.body.fullUrl })
+
+    // If the orignal url is not allready present
     if (!urlObj) {
       if (!customShortUrl) {
         urlObj = await shortUrl.create({ full: fullUrl })
-      } else {
-        const customUrl = await shortUrl.findOne({ short: customShortUrl })
-        if (customUrl) {
-          const err = new Error('This name is not available. Please choose a different one.')
-          err.statusCode = 409
-          throw err
-        }
-        urlObj = await shortUrl.create({ full: fullUrl, short: customShortUrl })
+        return
       }
+      const customUrl = await shortUrl.findOne({ short: customShortUrl })
+      if (customUrl) {
+        const err = new Error('This name is not available. Please choose a different one.')
+        err.statusCode = 409
+        throw err
+      }
+      urlObj = await shortUrl.create({ full: fullUrl, short: customShortUrl })
     }
     res.status(201).json({
       shortUrl: urlObj.short
