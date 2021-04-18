@@ -173,3 +173,87 @@ exports.locationMetrics = async (req, res, next) => {
     next(err)
   }
 }
+exports.deviceMetrics = async (req, res, next) => {
+  const urlParam = req.params.urlId
+  const startDate = req.body.startDate
+  const endDate = req.body.endDate
+  const map = new Map()
+  let totalClicks = 0
+  const metricsArray = []
+
+  try {
+    const id = ObjectId(urlParam)
+    const reqUrl = await Url.findById(id)
+
+    if (reqUrl.userId.toString() !== req.userId) {
+      const error = new Error('Not authorized')
+      error.statusCode = 403
+      throw error
+    }
+    const metricsObj = await Metrics.find({ urlId: urlParam, date: { $gte: startDate, $lte: endDate } })
+    metricsObj.forEach(obj => {
+      totalClicks += obj.clicks
+      if (map.has(obj.device)) {
+        const clicks = obj.clicks + map.get(obj.device)
+        map.set(obj.device, clicks)
+      } else {
+        map.set(obj.device, obj.clicks)
+      }
+    })
+    map.forEach((value, key) => {
+      const obj = {
+        device: key,
+        clicks: value,
+        percentage: ((value / totalClicks) * 100).toFixed(2)
+      }
+      metricsArray.push(obj)
+    })
+
+    res.status(200).send(metricsArray)
+  } catch (err) {
+    next(err)
+  }
+}
+
+exports.devicePerLocation = async (req, res, next) => {
+  const urlParam = req.params.urlId
+  const startDate = req.body.startDate
+  const endDate = req.body.endDate
+  const loc = req.body.loc
+  const map = new Map()
+  let totalClicks = 0
+  const metricsArray = []
+
+  try {
+    const id = ObjectId(urlParam)
+    const reqUrl = await Url.findById(id)
+
+    if (reqUrl.userId.toString() !== req.userId) {
+      const error = new Error('Not authorized')
+      error.statusCode = 403
+      throw error
+    }
+    const metricsObj = await Metrics.find({ urlId: urlParam, date: { $gte: startDate, $lte: endDate }, country: loc })
+    metricsObj.forEach(obj => {
+      totalClicks += obj.clicks
+      if (map.has(obj.device)) {
+        const clicks = obj.clicks + map.get(obj.device)
+        map.set(obj.device, clicks)
+      } else {
+        map.set(obj.device, obj.clicks)
+      }
+    })
+    map.forEach((value, key) => {
+      const obj = {
+        device: key,
+        clicks: value,
+        percentage: ((value / totalClicks) * 100).toFixed(2)
+      }
+      metricsArray.push(obj)
+    })
+
+    res.status(200).json({ metricsArray })
+  } catch (err) {
+    next(err)
+  }
+}

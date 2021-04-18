@@ -21,10 +21,12 @@ router.post('/edit',
       .trim()
   ], isAuth, urlController.editUrl)
 
-router.get('/:shortUrl', urlController.redirectToOrignalUrl)
-
-// router.get('/deviceMetrics/:urlId', isAuth, urlController.deviceMetrics)
+router.get('/:shortUrl', isAuth, urlController.redirectToOrignalUrl)
 
 router.post('/locationMetrics/:urlId', isAuth, urlController.locationMetrics)
+
+router.get('/deviceMetrics/:urlId', isAuth, urlController.deviceMetrics)
+
+router.post('/deviceLocMetrics/:urlId', isAuth, urlController.devicePerLocation)
 
 module.exports = router
