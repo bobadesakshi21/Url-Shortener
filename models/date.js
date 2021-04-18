@@ -19,7 +19,7 @@ const dateSchema = new Schema({
   },
   date: {
     type: String,
-    default: moment().format('DD-MM-YYYY`')
+    default: moment().format('DD-MM-YYYY')
   }
 })
 

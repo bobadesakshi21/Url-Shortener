@@ -9,6 +9,7 @@ const Url = require('../models/shortUrl')
 const Location = require('../models/location')
 const Device = require('../models/device')
 const Date = require('../models/date')
+const moment = require('moment')
 
 exports.urlShortener = async (req, res, next) => {
   const title = req.body.title
@@ -99,11 +100,12 @@ exports.editUrl = async (req, res, next) => {
 exports.redirectToOrignalUrl = async (req, res, next) => {
   const userAgent = new UserAgent()
   let ipAddress = req.ip
+  const today = moment().format('DD-MM-YYYY')
 
   const device = userAgent.deviceCategory
   if (ipAddress === '::1' || ipAddress === '::ffff:127.0.0.1') {
-    // ipAddress = '207.233.175.255'
-    ipAddress = '117.233.175.255'
+    ipAddress = '207.233.175.255'
+    // ipAddress = '117.233.175.255'
   }
   const geo = geoip.lookup(ipAddress)
   const country = geo.country
@@ -128,11 +130,17 @@ exports.redirectToOrignalUrl = async (req, res, next) => {
     locationObj.save()
   }
 
-  await Date.create({
-    urlId: urlObj._id,
-    country: country,
-    clicks: 1
-  })
+  const dateLocationObj = await Date.findOne({ urlId: urlObj._id, country: country, date: today })
+  if (!dateLocationObj) {
+    await Date.create({
+      urlId: urlObj._id,
+      country: country,
+      clicks: 1
+    })
+  } else {
+    dateLocationObj.clicks++
+    dateLocationObj.save()
+  }
 
   const deviceObj = await Device.findOne({ urlId: urlObj._id, device: device })
   if (!deviceObj) {
