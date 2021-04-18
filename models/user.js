@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const moment = require('moment')
 
 const userSchema = new Schema({
   username: {
@@ -17,6 +18,10 @@ const userSchema = new Schema({
   password: {
     type: 'String',
     required: true
+  },
+  date: {
+    type: String,
+    default: moment().format('DD-MM-YYYY')
   }
 })
 

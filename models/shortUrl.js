@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const shortId = require('shortid')
 const Schema = mongoose.Schema
+const moment = require('moment')
 
 const shortUrlSchema = new Schema({
   title: {
@@ -25,6 +26,10 @@ const shortUrlSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  date: {
+    type: String,
+    default: moment().format('DD-MM-YYYY')
   }
 })
 
