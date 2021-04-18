@@ -8,6 +8,7 @@ const geoip = require('geoip-lite')
 const Url = require('../models/shortUrl')
 const Location = require('../models/location')
 const Device = require('../models/device')
+const Date = require('../models/date')
 
 exports.urlShortener = async (req, res, next) => {
   const title = req.body.title
@@ -126,6 +127,12 @@ exports.redirectToOrignalUrl = async (req, res, next) => {
     locationObj.clicks++
     locationObj.save()
   }
+
+  await Date.create({
+    urlId: urlObj._id,
+    country: country,
+    clicks: 1
+  })
 
   const deviceObj = await Device.findOne({ urlId: urlObj._id, device: device })
   if (!deviceObj) {
