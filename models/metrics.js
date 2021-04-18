@@ -2,13 +2,17 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const moment = require('moment')
 
-const dateSchema = new Schema({
+const metricsSchema = new Schema({
   urlId: {
     type: Schema.Types.ObjectId,
     ref: 'Url',
     required: true
   },
   country: {
+    type: String,
+    required: true
+  },
+  device: {
     type: String,
     required: true
   },
@@ -23,4 +27,4 @@ const dateSchema = new Schema({
   }
 })
 
-module.exports = mongoose.model('Date', dateSchema)
+module.exports = mongoose.model('Metrics', metricsSchema)

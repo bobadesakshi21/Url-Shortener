@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const moment = require('moment')
 
 const deviceSchema = new Schema({
   urlId: {
@@ -15,6 +16,10 @@ const deviceSchema = new Schema({
     type: Number,
     required: true,
     default: 0
+  },
+  date: {
+    type: String,
+    default: moment().format('DD-MM-YYYY')
   }
 })
 
